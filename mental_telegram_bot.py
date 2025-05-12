@@ -5,6 +5,10 @@ from telegram import Update
 from telegram.ext import Application, MessageHandler, filters, ApplicationBuilder
 from nltk.sentiment import SentimentIntensityAnalyzer
 
+# Set up logging for debugging
+logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
+
+
 # Ensure NLTK dependencies are available
 nltk.download("punkt")
 nltk.download("vader_lexicon")
@@ -53,6 +57,36 @@ exercises_by_emotion = {
         "Break the problem into **3 parts**: What do you know? What's unclear? What's **one action** you can take now?",
         "Imagine explaining the issue to **a friend**—how would they see it?",
         "Take a **short walk**, clear your mind, and return to the problem with fresh eyes."
+    ]
+}
+stories_by_emotion = {
+    "stress": [
+        "💡 *The Wise Old Man* - A young man constantly complained about his life, always focusing on what he lacked. One day, an old man handed him a **🥤 half-filled glass** and said, *'Drink it or pour it away, but stop staring at what's missing.'* The young man realized that by obsessing over what he didn’t have, he was ignoring the blessings right in front of him.\n\n"
+        "**💡 Moral:** *Gratitude shifts your perspective. Focus on what you have, not what you lack.*"
+    ],
+    "anxiety": [
+        "💡 *The Elephant and the Rope* - A baby **🐘 elephant** was tied with a small rope to a wooden stake. As it grew, it never tried to break free, believing the rope still held it. In reality, the elephant had long since gained the **💪 strength** to escape, but its past experiences conditioned it to **never question its limits**.\n\n"
+        "**💡 Moral:** *Don't let past limitations stop you from discovering your true strength.*"
+    ],
+    "sadness": [
+        "💡 *The Small Candle* - In a **🌑 dark room**, a tiny **🕯️ candle** flickered alone, feeling insignificant. But as soon as it was lit, it filled the space with a **✨ warm glow**, proving that even the smallest light could brighten someone's world. It realized its value—no matter how small, it had the power to illuminate the darkness.\n\n"
+        "**💡 Moral:** *Even small acts of kindness can make a big difference.*"
+    ],
+    "loneliness": [
+        "💡 *The Boy and the Starfish* - A boy walked along a **🏝️ beach** covered with stranded **⭐ starfish**. One by one, he tossed them back into the ocean. A man approached him and said, *'You can’t possibly save them all.'* The boy smiled and replied, *'Maybe not, but I made a difference to that one.'*\n\n"
+        "**💡 Moral:** *Small actions matter more than you think. Helping even one person can create a meaningful impact.*"
+    ],
+    "anger": [
+        "💡 *The Resilient Bamboo* - During a **🌪️ fierce storm**, a tall, rigid **🌳 oak tree** stood firm—until it snapped under the wind’s pressure. Nearby, a **🎋 bamboo grove** bent gracefully with the storm, swaying with the wind instead of fighting against it. When the storm passed, the bamboo remained standing.\n\n"
+        "**💡 Moral:** *Flexibility helps you endure life’s storms. Learning to adapt is the key to resilience.*"
+    ],
+    "confusion": [
+        "💡 *The Two Seeds* - Two **🌱 seeds** lay side by side in the soil. One eagerly embraced the **🌿 earth**, stretched its roots, and sprouted into a **🌳 strong tree**. The other seed hesitated, fearing the **❓ unknown**, and remained buried forever. Its refusal to grow left it trapped, never knowing its true potential.\n\n"
+        "**💡 Moral:** *Growth requires courage and stepping outside your comfort zone.*"
+    ],
+    "motivation": [
+        "💡 *The Little Seed That Bloomed* - A **🌱 tiny seed** was planted in **🪨 rocky, dry soil**. Though conditions were harsh, it **☀️ pushed through obstacles**, sprouting little by little. With **🌿 patience and persistence**, the seed transformed into a vibrant, thriving **🌸 flower**—proof that **small efforts, when repeated, can lead to magnificent growth.**\n\n"
+        "**💡 Moral:** *Persistence leads to success. Small steps, taken consistently, can create powerful transformations.*"
     ]
 }
 
@@ -137,4 +171,4 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 
 if __name__ == "__main__":
-    app.run_polling()
+    app.run_polling(drop_pending_updates=True)
