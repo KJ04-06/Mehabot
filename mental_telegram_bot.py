@@ -2,11 +2,12 @@ import logging
 import os
 import random
 import nltk
+import asyncio
+from flask import Flask
 from telegram import Update
 from telegram.ext import Application, MessageHandler, filters, ApplicationBuilder
 from nltk.sentiment import SentimentIntensityAnalyzer
-
-
+import threading
 
 # Set up logging for debugging
 logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
@@ -169,29 +170,25 @@ async def message_handler(update: Update, context):
     # Default response
     await update.message.reply_text("Tell me more about how you're feeling. 💙")
 
-from flask import Flask
-import threading
-from telegram.ext import ApplicationBuilder
+# Telegram Bot setup
+app = ApplicationBuilder().token(TOKEN).build()
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 
-# Flask to keep Render awake
+# Flask setup to keep Render awake
 flask_app = Flask(__name__)
 
 @flask_app.route('/')
 def home():
     return "Meha is running!"
 
-# Start Telegram polling in a separate thread
-import asyncio
-
-def start_bot():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    
-    app = ApplicationBuilder().token(os.getenv("TELEGRAM_BOT_TOKEN")).build()
-    app.run_polling(drop_pending_updates=True)
-
-if __name__ == "__main__":
-    bot_thread = threading.Thread(target=start_bot, daemon=True)
-    bot_thread.start()
+def run_flask():
     PORT = int(os.getenv("PORT", 8080))
     flask_app.run(host="0.0.0.0", port=PORT)
+
+if __name__ == "__main__":
+    # Start Flask in a separate thread
+    flask_thread = threading.Thread(target=run_flask, daemon=True)
+    flask_thread.start()
+
+    # Run Telegram polling in the main thread
+    app.run_polling(drop_pending_updates=True)
