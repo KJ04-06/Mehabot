@@ -181,7 +181,12 @@ def home():
     return "Meha is running!"
 
 # Start Telegram polling in a separate thread
+import asyncio
+
 def start_bot():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    
     app = ApplicationBuilder().token(os.getenv("TELEGRAM_BOT_TOKEN")).build()
     app.run_polling(drop_pending_updates=True)
 
