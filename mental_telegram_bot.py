@@ -104,11 +104,11 @@ jokes = [
 def detect_emotion(user_input):
     user_input = user_input.lower()
     emotions = {
-        "anxiety": ["anxious", "nervous","worried","troubled","disturbed"],
-        "stress": ["stressed", "overwhelmed","tensed"],
-        "sadness": ["sad", "down","miserable","upset"],
-        "motivation": ["unmotivated", "weak","lazy"],
-        "loneliness": ["lonely", "alone","isolated","abondoned"],
+        "anxiety": ["anxious", "nervous", "worried", "troubled", "disturbed"],
+        "stress": ["stressed", "overwhelmed", "tensed"],
+        "sadness": ["sad", "down", "miserable", "upset"],
+        "motivation": ["unmotivated", "weak", "lazy"],
+        "loneliness": ["lonely", "alone", "isolated", "abandoned"],
         "anger": ["angry", "furious", "frustrated", "annoyed"],
         "confusion": ["confused", "uncertain", "lost"]
     }
@@ -169,10 +169,24 @@ async def message_handler(update: Update, context):
     # Default response
     await update.message.reply_text("Tell me more about how you're feeling. 💙")
 
-# Telegram Bot setup
-app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
+from flask import Flask
+import threading
+from telegram.ext import ApplicationBuilder
 
-# Start Telegram Bot polling
-if __name__ == "__main__":
+# Flask to keep Render awake
+flask_app = Flask(__name__)
+
+@flask_app.route('/')
+def home():
+    return "Meha is running!"
+
+# Start Telegram polling in a separate thread
+def start_bot():
+    app = ApplicationBuilder().token(os.getenv("TELEGRAM_BOT_TOKEN")).build()
     app.run_polling(drop_pending_updates=True)
+
+if __name__ == "__main__":
+    bot_thread = threading.Thread(target=start_bot, daemon=True)
+    bot_thread.start()
+    PORT = int(os.getenv("PORT", 8080))
+    flask_app.run(host="0.0.0.0", port=PORT)
