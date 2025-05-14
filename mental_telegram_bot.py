@@ -5,7 +5,7 @@ import nltk
 from telegram import Update
 from telegram.ext import Application, MessageHandler, filters, ApplicationBuilder
 from nltk.sentiment import SentimentIntensityAnalyzer
-from flask import Flask
+
 
 
 # Set up logging for debugging
@@ -173,14 +173,6 @@ async def message_handler(update: Update, context):
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 
-# Flask Server to Keep Meha Active on Render
-flask_app = Flask(__name__)
-
-@flask_app.route('/')
-def home():
-    return "Meha is running!"
-
+# Start Telegram Bot polling
 if __name__ == "__main__":
-    PORT = int(os.environ.get("PORT", 8080))  
-    flask_app.run(host="0.0.0.0", port=PORT)  
-    app.run_polling(drop_pending_updates=True)  # Ensure polling starts
+    app.run_polling(drop_pending_updates=True)
